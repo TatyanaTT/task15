@@ -1,0 +1,16 @@
+This is 14th homework.
+
+In file "index" you can see example of using this project.
+The connect to database changed in style OOP (DatabaseConfig class).
+The basic classes are BaseEntity and EntityManager and they are abstract.
+Classes Article and User are children of BaseEntity,
+the same way for ArticleManager and UserManager with EntityManager.
+Children of EntityManager have addiction, aggregation, with class DatabaseConfig.
+Also, class Article has the same with Users. Details: property blogger (Article) is property id in User.
+The main methods of EntityManager's objects are:
+- getById: returns object from appropriate database table (`blog` - Article, `users` - User)
+with the same id that in method's argument and also this object from class BaseEntity.
+- save has also one argument - object from class BaseEntity,it will create
+row in appropriate database table, if id-property from object isn't exist.
+But if id exists then method update information.
+

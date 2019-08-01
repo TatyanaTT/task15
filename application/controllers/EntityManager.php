@@ -1,6 +1,8 @@
 <?php
 
 namespace Controllers;
+use Exception;
+
 error_reporting(E_ALL);
 ini_set('display_errors', 'On');
 
@@ -13,6 +15,8 @@ abstract class EntityManager
         if (!empty($_SERVER['HTTP_TOKEN']) and $this->isTokenValid($_SERVER['HTTP_TOKEN'])) {
             return true;
         } else {
+            header("HTTP/1.1 401 Unauthorized");
+            throw new Exception("Token isn't written");
             return false;
         }
     }
@@ -20,8 +24,11 @@ abstract class EntityManager
     public function isTokenValid($token)
     {
         if (!empty($this->findUserIdByToken($token))) {
+            header("HTTP/1.1 200 OK");
             return true;
         } else {
+            header("HTTP/1.1 401 Unauthorized");
+            throw new Exception("Wrong token");
             return false;
         }
     }
@@ -33,7 +40,9 @@ abstract class EntityManager
         return $this->toString($rows);
     }
     public function toString($array) {
-        return implode($array);
+        if (!empty($array)){
+            return implode($array);
+        }
     }
 
 }

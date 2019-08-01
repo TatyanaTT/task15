@@ -1,9 +1,9 @@
 <?php
 
 
-namespace Controllers;
+namespace Core;
 
-require "/var/www/html/sandbox/git/Homework/task17/config/config.php";
+require "/var/www/html/sandbox/git/task15/config/config.php";
 
 class MysqlConfig extends DatabaseConfig
 {

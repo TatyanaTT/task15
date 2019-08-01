@@ -5,6 +5,7 @@ namespace Controllers;
 use Models\BaseEntity;
 use Models\User;
 use Models\Article;
+use Core\MysqlConfig;
 
 error_reporting(E_ALL);
 ini_set('display_errors', 'On');
@@ -26,8 +27,11 @@ class ArticleManager extends EntityManager implements ManagerInterface
 
     public function actionIndex()
     {
+        //find users article
+        // TODO: Implement actionIndex() method.
         $rows = array();
-        if ($this->checkToken() and $_SERVER['REQUEST_METHOD'] = 'GET') {
+        if ($this->checkToken() and $_SERVER['REQUEST_METHOD'] == 'GET') {
+            header("HTTP/1.1 200 OK");
             $query = "SELECT blog.title, blog.text FROM `blog` INNER JOIN `users`
                     ON blog.blogger=users.id WHERE users.token =" . $_SERVER['HTTP_TOKEN'];
             $selectByToken = mysqli_query($this->myDB->connect(), $query);
@@ -35,24 +39,34 @@ class ArticleManager extends EntityManager implements ManagerInterface
                 $rows[] = $array;
             }
         }
+        else {
+            header("HTTP/1.1 404 Not Found");
+        }
         return $rows;
     }
 
     public function actionCreate()
     {
-        if ($this->checkToken() and $_SERVER['REQUEST_METHOD'] = 'POST') {
+        //create new article for user
+        if ($this->checkToken() and $_SERVER['REQUEST_METHOD'] == 'POST') {
+            header("HTTP/1.1 200 OK");
             $idUser = $this->findUserIdByToken($_SERVER['HTTP_TOKEN']);
             $query = "INSERT INTO `blog` (blog.title, blog.text,blog.blogger) 
                         VALUES ('" . $_POST['title'] . "','" . $_POST['text'] . "','"
                 . $idUser . "')";
             mysqli_query($this->myDB->connect(), $query);
         }
+        else {
+            header("HTTP/1.1 404 Not Found");
+        }
 
     }
 
     public function actionUpdate()
     {
-        if ($this->checkToken() and $_SERVER['REQUEST_METHOD'] = 'PUT') {
+        // update existing users article
+        if ($this->checkToken() and $_SERVER['REQUEST_METHOD'] == 'PUT') {
+            header("HTTP/1.1 200 OK");
             $_PUT = array();
             parse_str(file_get_contents("php://input"), $_PUT);
             if ($this->isIdValidForUpdating($_PUT['id'])) {
@@ -65,22 +79,32 @@ class ArticleManager extends EntityManager implements ManagerInterface
                 mysqli_query($this->myDB->connect(), $query);
             }
         }
+        else {
+            header("HTTP/1.1 404 Not Found");
+        }
     }
 
     public function actionDelete()
     {
-        $_DELETE = array();
-        parse_str(file_get_contents("php://input"), $_DELETE);
-        if ($this->checkToken() and $_SERVER['REQUEST_METHOD'] = 'DELETE') {
+        // delete existing users article
+        if ($this->checkToken() and $_SERVER['REQUEST_METHOD'] == 'DELETE') {
+            $_DELETE = array();
+            parse_str(file_get_contents("php://input"), $_DELETE);
+            header("HTTP/1.1 200 OK");
             if ($this->isIdValidForUpdating($_DELETE['id'])) {
                 $query = "DELETE FROM blog WHERE id = " . $_DELETE['id'];
                 mysqli_query($this->myDB->connect(), $query);
             }
         }
+        else {
+            header("HTTP/1.1 404 Not Found");
+        }
     }
 
 
     private function isIdValidForUpdating($id)
+        //function is necessary for don't to delete or
+        //  to update string that doesn't belong to blogger with writing token
     {
         $idUser = $this->findUserIdByToken($_SERVER['HTTP_TOKEN']);
         if ($idUser == ($this->getById($id)->getBlogger())) {
@@ -91,7 +115,6 @@ class ArticleManager extends EntityManager implements ManagerInterface
 
     }
 
-
     /**
      * @param int $id
      * @return BaseEntity|null
@@ -100,6 +123,7 @@ class ArticleManager extends EntityManager implements ManagerInterface
 
     private function getById(int $id): ?BaseEntity
     {
+        //find string in database with adjusted id
         $query = "SELECT * FROM blog WHERE id = $id";
         $selectById = mysqli_query($this->myDB->connect(), $query);
         $rows = mysqli_fetch_array($selectById, MYSQLI_ASSOC);

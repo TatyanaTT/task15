@@ -31,6 +31,9 @@ class Router
         }
         if (method_exists($controller, $actionName)) {
             $controller->$actionName();
+            if ($actionName == "actionIndex"){
+                View::showResult($controller->$actionName());
+            }
         } else {
             Router::ErrorPage404();
         }

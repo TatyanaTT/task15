@@ -2,6 +2,7 @@
 
 
 namespace Core;
+
 use Exception;
 
 class DatabaseConfig
@@ -15,18 +16,14 @@ class DatabaseConfig
     function connect()
     {
         $link = mysqli_connect($this->host, $this->user, $this->password);
-        if (!$link){
+        if (!$link) {
             header("HTTP/1.1 404 Not Found");
             throw new Exception("Can\'t connect");
-        }
-        else
-        {
-            if (!mysqli_select_db($link, $this->databaseName)){
+        } else {
+            if (!mysqli_select_db($link, $this->databaseName)) {
                 header("HTTP/1.1 404 Not Found");
                 throw new Exception("Can\'t connect to DBName");
-            }
-            else
-            {
+            } else {
                 header("HTTP/1.1 200 OK");
             }
         }
